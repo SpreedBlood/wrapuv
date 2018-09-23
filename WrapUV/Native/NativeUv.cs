@@ -23,6 +23,22 @@ namespace WrapUV.Native
         internal static extern IntPtr uv_handle_size(Uv_handle_type handleType);
 
         /// <summary>
+        /// Starts to close the handle.
+        /// </summary>
+        /// <param name="handle">The pointer to the handle.</param>
+        /// <param name="close_cb">The callback that's invoked when the handle is closed.</param>
+        [DllImport("libuv", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern void uv_close(IntPtr handle, uv_close_cb close_cb);
+
+        /// <summary>
+        /// Checks if the handle is closing.
+        /// </summary>
+        /// <param name="handle">The pointer to the handle.</param>
+        /// <returns>The result, 0 = not closing.</returns>
+        [DllImport("libuv", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern int uv_is_closing(IntPtr handle);
+
+        /// <summary>
         /// Start the timer. (Timeout & repeat are in milliseconds).
         /// </summary>
         /// <param name="handle">The pointer to the handle.</param>

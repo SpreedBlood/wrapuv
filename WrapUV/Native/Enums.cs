@@ -1,13 +1,13 @@
 ﻿namespace WrapUV.Native
 {
-    enum Uv_run_mode
+    internal enum Uv_run_mode
     {
         UV_RUN_DEFAULT = 0,
         UV_RUN_ONCE,
         UV_RUN_NOWAIT
     }
 
-    enum Uv_err_code
+    internal enum Uv_err_code
     {
         UV_OK = 0,
         UV_E2BIG,
@@ -87,7 +87,7 @@
         UV_EMLINK,
     }
 
-    enum Uv_handle_type
+    internal enum Uv_handle_type
     {
         UV_UNKNOWN_HANDLE = 0,
         UV_ASYNC,

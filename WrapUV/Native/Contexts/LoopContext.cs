@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace WrapUV.Native
+namespace WrapUV.Native.Contexts
 {
     internal sealed unsafe class LoopContext
     {

@@ -1,5 +1,5 @@
-﻿using WrapUV.Native;
-using System;
+﻿using System;
+using WrapUV.Native.Contexts;
 
 namespace WrapUV
 {
@@ -17,6 +17,9 @@ namespace WrapUV
 
         public Timer NewTimer(Action callback) =>
             NewTimer(ignore => callback(), null);
+
+        public Async NewAsync(Action<Async> callback) =>
+            new Async(_loopContext.LoopPointer, callback);
 
         public void RunDefault() =>
             _loopContext.Run();

@@ -1,22 +1,23 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace WrapUV.Native
+namespace WrapUV.Native.Contexts
 {
-    internal unsafe class HandleContext
+    internal unsafe class HandleContext : IDisposable
     {
-        internal IntPtr HandlePointer { get; }
+        internal IntPtr HandlePointer { get; private set; }
 
         internal HandleContext(
             IntPtr loopHandle,
-            Uv_handle_type handleType)
+            Uv_handle_type handleType,
+            Func<IntPtr, IntPtr, int> handleInit)
         {
             int handleSize = Native.uv_handle_size(handleType).ToInt32();
             IntPtr handlePointer = Marshal.AllocCoTaskMem(handleSize);
 
             try
             {
-                int result = Native.uv_timer_init(loopHandle, handlePointer);
+                int result = handleInit(loopHandle, handlePointer);
                 Native.CheckIfError(result);
             }
             catch
@@ -40,6 +41,51 @@ namespace WrapUV.Native
             {
                 throw new InvalidOperationException($"The handle isn't allocated! {GetType()}");
             }
+        }
+
+        /// <summary>
+        /// Closes the handle & releases all the resources.
+        /// </summary>
+        public void Dispose()
+        {
+            IntPtr handlePointer = ((Uv_handle_t*)HandlePointer)->data;
+            //Make sure that the handle pointer is valid.
+            if (handlePointer != IntPtr.Zero)
+            {
+                GCHandle handle = GCHandle.FromIntPtr(handlePointer);
+                if (handle.IsAllocated)
+                {
+                    //Free the gc handle.
+                    handle.Free();
+
+                    //Make the data of the handle invalid.
+                    ((Uv_handle_t*)HandlePointer)->data = IntPtr.Zero;
+                }
+            }
+
+            //Free the resources & make the pointer invalid.
+            Marshal.FreeCoTaskMem(HandlePointer);
+            HandlePointer = IntPtr.Zero;
+        }
+
+        /// <summary>
+        /// Starts closing the handle.
+        /// </summary>
+        internal void Close()
+        {
+            int result = Native.uv_is_closing(HandlePointer);
+
+            //Make sure that the handle isn't closing.
+            if (result == 0)
+            {
+                Native.uv_close(HandlePointer, CloseCallback);
+            }
+        }
+
+        private static void CloseCallback(IntPtr handle)
+        {
+            IDisposable disposableTarget = FromPointer<IDisposable>(handle);
+            disposableTarget.Dispose();
         }
 
         /// <summary>

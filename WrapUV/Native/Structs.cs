@@ -18,7 +18,7 @@ namespace WrapUV.Native
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    struct Uv_handle_t
+    internal struct Uv_handle_t
     {
         /// <summary>
         /// The data of the handle.

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace WrapUV.Native
+namespace WrapUV.Native.Contexts
 {
     internal sealed unsafe class TimerContext : HandleContext
     {
@@ -11,7 +11,7 @@ namespace WrapUV.Native
             IntPtr loopPtr,
             Action<object> callback,
             object state)
-            : base(loopPtr, Uv_handle_type.UV_TIMER)
+            : base(loopPtr, Uv_handle_type.UV_TIMER, Native.uv_timer_init)
         {
             _callback = callback;
             _state = state;
@@ -29,6 +29,8 @@ namespace WrapUV.Native
             IsAllocated();
             int result = Native.uv_timer_stop(HandlePointer);
             Native.CheckIfError(result);
+
+            Close();
         }
 
         internal void SetRepeat(long repeat)
